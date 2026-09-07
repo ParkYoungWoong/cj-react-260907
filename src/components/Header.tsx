@@ -4,10 +4,11 @@ import { Link } from 'react-router'
 export default function Header() {
   return (
     <>
-      <div>
+      <header className="flex gap-4">
         <Link to="/">Home</Link>
         <Link to="/about">About</Link>
-      </div>
+        <Link to="/movies">Movies</Link>
+      </header>
     </>
   )
 }
