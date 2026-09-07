@@ -5,6 +5,7 @@ import About from './pages/About'
 import Movies from './pages/Movies'
 import MovieDetails from './pages/MovieDetails'
 import NotFound from './pages/NotFound'
+import SignIn from './pages/SignIn'
 import requiresAuth from './loaders/requiresAuth'
 
 // 라우트 객체
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
         path: '/movies/:movieId',
         loader: requiresAuth,
         element: <MovieDetails />
+      },
+      {
+        path: '/signin',
+        element: <SignIn />
       }
     ]
   },
