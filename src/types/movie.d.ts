@@ -16,7 +16,8 @@ export interface SimpleMovie {
   Type: string
   Poster: string
 }
-export interface Root {
+
+export interface Movie {
   Title: string
   Year: string
   Rated: string

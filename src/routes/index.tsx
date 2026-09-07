@@ -4,6 +4,8 @@ import Home from './pages/Home'
 import About from './pages/About'
 import Movies from './pages/Movies'
 import MovieDetails from './pages/MovieDetails'
+import NotFound from './pages/NotFound'
+import requiresAuth from './loaders/requiresAuth'
 
 // 라우트 객체
 const router = createBrowserRouter([
@@ -23,11 +25,15 @@ const router = createBrowserRouter([
         element: <Movies />
       },
       {
-        // '/about/dashboard/movies/:movieId'
         path: '/movies/:movieId',
+        loader: requiresAuth,
         element: <MovieDetails />
       }
     ]
+  },
+  {
+    path: '*',
+    element: <NotFound />
   }
 ])
 
