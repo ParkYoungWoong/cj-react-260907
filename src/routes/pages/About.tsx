@@ -1,9 +1,9 @@
 // import { useState } from 'react'
 
-export default function Sample() {
+export default function About() {
   return (
     <>
-      <div></div>
+      <div>About Page!</div>
     </>
   )
 }
