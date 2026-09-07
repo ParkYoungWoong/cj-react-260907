@@ -1,15 +1,18 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
+import type { MovieListResponse, SimpleMovie } from '@/types/movie'
 
 export default function Movies() {
   const [searchText, setSearchText] = useState('')
-  const [movies, setMovies] = useState([])
+  // const [movies, setMovies] = useState<MovieListResponse['Search']>([])
+  const [movies, setMovies] = useState<SimpleMovie[]>([])
 
   async function fetchMovies() {
     const res = await fetch(
       `https://omdbapi.com?apikey=9d38c929&s=${searchText}`
     )
-    const data = await res.json()
-    setMovies(data.Search || [])
+    const data: MovieListResponse = await res.json()
+    setMovies(data.Response === 'True' ? data.Search : [])
   }
 
   return (
@@ -28,7 +31,9 @@ export default function Movies() {
       <ul>
         {movies.map(movie => (
           <li key={movie.imdbID}>
-            {movie.Title} ({movie.Year})
+            <Link to={`/movies/${movie.imdbID}`}>
+              {movie.Title} ({movie.Year})
+            </Link>
           </li>
         ))}
       </ul>

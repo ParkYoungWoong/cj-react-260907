@@ -3,6 +3,7 @@ import Default from './layouts/Default'
 import Home from './pages/Home'
 import About from './pages/About'
 import Movies from './pages/Movies'
+import MovieDetails from './pages/MovieDetails'
 
 // 라우트 객체
 const router = createBrowserRouter([
@@ -20,6 +21,11 @@ const router = createBrowserRouter([
       {
         path: '/movies',
         element: <Movies />
+      },
+      {
+        // '/about/dashboard/movies/:movieId'
+        path: '/movies/:movieId',
+        element: <MovieDetails />
       }
     ]
   }
