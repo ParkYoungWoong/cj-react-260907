@@ -56,7 +56,7 @@ export default function Movies() {
     if (inView) {
       fetchNextPage()
     }
-  }, [inView])
+  }, [inView, fetchNextPage])
 
   function fetchMovies() {
     setSearchText(inputText)
