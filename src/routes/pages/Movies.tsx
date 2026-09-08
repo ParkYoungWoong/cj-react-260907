@@ -41,11 +41,9 @@ export default function Movies() {
       return null
     },
     select: data => {
-      if (data.pages.every(page => page.Response === 'True')) {
-        console.log(data.pages.flatMap(page => page.Search))
-        return data.pages.flatMap(page => page.Search)
-      }
-      return []
+      return data.pages.flatMap(page => {
+        return page.Response === 'True' ? page.Search : []
+      })
     }
   })
   const { data: movies, isFetching, fetchNextPage } = useInfiniteQuery(options)
