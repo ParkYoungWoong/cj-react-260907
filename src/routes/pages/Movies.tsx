@@ -1,4 +1,5 @@
 import { Link } from 'react-router'
+import { Fragment } from 'react'
 import { useMovieStore } from '@/stores/movie'
 import {
   useInfiniteQuery,
@@ -16,21 +17,38 @@ export default function Movies() {
 
   const options = infiniteQueryOptions({
     queryKey: ['movies', searchText],
-    queryFn: async () => {
-      await new Promise(resolve => setTimeout(resolve, 2000))
+    queryFn: async ({ pageParam }) => {
+      // await new Promise(resolve => setTimeout(resolve, 2000))
       const res = await fetch(
-        `https://omdbapi.com?apikey=9d38c929&s=${searchText}`
+        `https://omdbapi.com?apikey=9d38c929&s=${searchText}&page=${pageParam}`
       )
       const data: MovieListResponse = await res.json()
-      return data.Response === 'True' ? data.Search : []
+      return data
     },
-    staleTime: 1000 * 3,
+    staleTime: 1000 * 60 * 10,
     enabled: Boolean(searchText),
     placeholderData: prev => prev,
     initialPageParam: 1,
-    getNextPageParam: () => {}
+    getNextPageParam: (lastPage, pages) => {
+      // 예시) '821' => 821 => 82.1 => 83
+      if (lastPage.Response === 'True') {
+        const maxPage = Math.ceil(Number(lastPage.totalResults) / 10)
+        const currentPage = pages.length
+        if (currentPage < maxPage) {
+          return currentPage + 1
+        }
+      }
+      return null
+    },
+    select: data => {
+      if (data.pages.every(page => page.Response === 'True')) {
+        console.log(data.pages.flatMap(page => page.Search))
+        return data.pages.flatMap(page => page.Search)
+      }
+      return []
+    }
   })
-  const { data: movies, isFetching } = useInfiniteQuery(options)
+  const { data: movies, isFetching, fetchNextPage } = useInfiniteQuery(options)
 
   function fetchMovies() {
     setSearchText(inputText)
@@ -56,6 +74,21 @@ export default function Movies() {
       </div>
       {isFetching && <div>가져오는 중입니다..</div>}
       <ul>
+        {/* {data?.pages.map((page, index) => {
+          return (
+            <Fragment key={index}>
+              {page.Search.map(movie => {
+                return (
+                  <li key={movie.imdbID}>
+                    <Link to={`/movies/${movie.imdbID}`}>
+                      {movie.Title} ({movie.Year})
+                    </Link>
+                  </li>
+                )
+              })}
+            </Fragment>
+          )
+        })} */}
         {movies?.map(movie => (
           <li key={movie.imdbID}>
             <Link to={`/movies/${movie.imdbID}`}>
@@ -64,6 +97,7 @@ export default function Movies() {
           </li>
         ))}
       </ul>
+      <button onClick={() => fetchNextPage()}>더보기</button>
     </>
   )
 }
