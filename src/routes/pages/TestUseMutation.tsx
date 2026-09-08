@@ -11,11 +11,14 @@ export default function Text() {
     onMutate: n => {
       console.log(n) // 2
       // 낙관적 업데이트!
+      return '원본데이터'
     },
     onSuccess: (num: number) => {
       console.log(num) // 125
     },
-    onError: () => {},
+    onError: (_error, _n, origin) => {
+      console.log(origin) // '원본데이터'
+    },
     onSettled: () => {}
   })
 

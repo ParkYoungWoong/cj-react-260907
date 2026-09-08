@@ -1,4 +1,4 @@
-import { useQuery, useMutation } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import type { Todo } from '@/types/todo'
 import { useState } from 'react'
 
@@ -12,6 +12,7 @@ const API_HEADERS = {
 
 export default function Todos() {
   const [title, setTitle] = useState('')
+  const queryClient = useQueryClient()
 
   const { data: todos } = useQuery<Todo[]>({
     queryKey: ['todos'],
@@ -40,11 +41,26 @@ export default function Todos() {
       const todo = await res.json()
       return todo
     },
-    onMutate: () => {},
-    onSuccess: (todo: Todo) => {
-      const prevTodos = queryClient.getQueryData(['todos'])
+    onMutate: () => {
+      const prevTodos = queryClient.getQueryData<Todo[]>(['todos']) // 캐시 데이터 가져오기 / .getQueryData(쿼리키)
+      if (!prevTodos) return
+      const todo: Todo = {
+        id: Math.random().toString(),
+        title: title,
+        done: false
+      }
+      queryClient.setQueryData(['todos'], [todo, ...prevTodos]) // 캐시 데이터 갱신하기 / .setQueryData(쿼리키, 데이터)
+      return prevTodos
     },
-    onError: () => {},
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['todos'] }) // 새 데이터 가져오기!
+    },
+    onError: (_error, _payload, prevTodos) => {
+      if (prevTodos) {
+        queryClient.setQueryData(['todos'], prevTodos)
+        alert('문제가 발생했습니다. 다시 시도해 주세요~')
+      }
+    },
     onSettled: () => {}
   })
 
