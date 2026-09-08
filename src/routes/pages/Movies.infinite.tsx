@@ -1,18 +1,15 @@
 import { Link } from 'react-router'
-import { useEffect } from 'react'
+import { useRef, useEffect } from 'react'
 import { useMovieStore } from '@/stores/movie'
 import { useInfiniteQuery, infiniteQueryOptions } from '@tanstack/react-query'
 import type { MovieListResponse } from '@/types/movie'
-import { useInView } from 'react-intersection-observer'
 
 export default function Movies() {
   const inputText = useMovieStore(s => s.inputText)
   const setInputText = useMovieStore(s => s.setInputText)
   const searchText = useMovieStore(s => s.searchText)
   const setSearchText = useMovieStore(s => s.setSearchText)
-  const { ref, inView } = useInView({
-    rootMargin: '500px'
-  })
+  const observerRef = useRef<HTMLButtonElement>(null)
 
   const options = infiniteQueryOptions({
     queryKey: ['movies', searchText],
@@ -53,10 +50,15 @@ export default function Movies() {
   } = useInfiniteQuery(options)
 
   useEffect(() => {
-    if (inView) {
-      fetchNextPage()
+    const io = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) {
+        fetchNextPage()
+      }
+    })
+    if (observerRef.current) {
+      io.observe(observerRef.current) // 더보기 버튼!
     }
-  }, [inView])
+  }, [hasNextPage, fetchNextPage])
 
   function fetchMovies() {
     setSearchText(inputText)
@@ -108,7 +110,7 @@ export default function Movies() {
         </button>
       )} */}
       <button
-        ref={ref}
+        ref={observerRef}
         style={{
           display: isFetching || !hasNextPage ? 'none' : 'block'
         }}
