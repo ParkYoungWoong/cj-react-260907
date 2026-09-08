@@ -5,11 +5,15 @@ import type { MovieListResponse, SimpleMovie } from '@/types/movie'
 export const useMovieStore = create(
   combine(
     {
+      inputText: '',
       searchText: '',
       movies: [] as SimpleMovie[]
     },
     (set, get) => {
       return {
+        setInputText(inputText: string) {
+          set({ inputText })
+        },
         setSearchText(searchText: string) {
           set({ searchText })
         },
