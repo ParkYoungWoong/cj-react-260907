@@ -1,10 +1,6 @@
 import { Link } from 'react-router'
 import { useMovieStore } from '@/stores/movie'
-import {
-  useInfiniteQuery,
-  useQueryClient,
-  infiniteQueryOptions
-} from '@tanstack/react-query'
+import { useQuery, useQueryClient, queryOptions } from '@tanstack/react-query'
 import type { MovieListResponse } from '@/types/movie'
 
 export default function Movies() {
@@ -14,7 +10,7 @@ export default function Movies() {
   const setSearchText = useMovieStore(s => s.setSearchText)
   const queryClient = useQueryClient()
 
-  const options = infiniteQueryOptions({
+  const options = queryOptions({
     queryKey: ['movies', searchText],
     queryFn: async () => {
       await new Promise(resolve => setTimeout(resolve, 2000))
@@ -26,11 +22,9 @@ export default function Movies() {
     },
     staleTime: 1000 * 3,
     enabled: Boolean(searchText),
-    placeholderData: prev => prev,
-    initialPageParam: 1,
-    getNextPageParam: () => {}
+    placeholderData: prev => prev
   })
-  const { data: movies, isFetching } = useInfiniteQuery(options)
+  const { data: movies, isFetching } = useQuery(options)
 
   function fetchMovies() {
     setSearchText(inputText)
